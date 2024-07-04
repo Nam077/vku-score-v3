@@ -1,15 +1,16 @@
-// app/layout.tsx
-
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
 import ThemeProviderWrapper from '@/core/ThemeProviderWrapper';
 import Header from '@/core/layout/Header';
+import Fab from '@mui/material/Fab';
 
 const roboto = Roboto({
     weight: '400',
     subsets: ['vietnamese'],
 });
+
+
 
 export const metadata: Metadata = {
     title: 'Create Next App',
@@ -21,10 +22,11 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <html lang='en'>
         <body className={`${roboto.className} bg-gray-100`}>
         <ThemeProviderWrapper>
-           <Header />
+            <Header />
             <main className='p-4'>
                 {children}
             </main>
+
         </ThemeProviderWrapper>
         </body>
         </html>
