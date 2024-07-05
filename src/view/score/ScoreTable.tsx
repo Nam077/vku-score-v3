@@ -24,15 +24,15 @@ import {
     Card,
     CardHeader,
     CardContent,
-    Tooltip,
+    Tooltip, Checkbox, FormLabel, FormControlLabel,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
-import DebouncedInput from '@/view/component/DebouncedInput';
 import { useScore } from '@/view/score/ScoreProvider';
 import { Delete, Restore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { IScore, ScoreCh } from '@/common/interfaces/score';
+import DebouncedInput from '@/view/component/DebouncedInput';
 
 interface IScoreWithAction extends IScore {
     action?: string;
@@ -62,6 +62,7 @@ const TableCellHeader = styled(TableCell)`
   border-bottom: 1px solid #e0e0e0;
   border-right: 1px solid #e0e0e0;
   background-color: ${(props) => props.theme.palette.background.default};
+
   &:last-child {
     border-right: none;
   }
@@ -109,6 +110,10 @@ const ScoreTable: React.FC = () => {
 
     const handleScoreChange = useCallback((row: IScore, newValue: ScoreCh) => {
         dispatch({ type: 'CHANGE_SCORE_CH', payload: { row, newValue } });
+    }, [dispatch]);
+
+    const handleDiem10Change = useCallback((row: IScore, newValue: number) => {
+        dispatch({ type: 'CHANGE_SCORE_T10', payload: { row, newValue } });
     }, [dispatch]);
 
     const sortedScores = useMemo(() => {
@@ -165,6 +170,13 @@ const ScoreTable: React.FC = () => {
             }),
             columnHelper.accessor('scoreT10', {
                 header: 'Điểm hệ 10',
+                cell: (info) => (
+                    <TextField
+                        value={info.row.original.scoreT10 || ''}
+                        variant='outlined'
+                        onChange={(event) => handleDiem10Change(info.row.original, Number(event.target.value))}
+                    />
+                ),
             }),
             columnHelper.accessor('scoreCh', {
                 header: 'Điểm chữ',
@@ -186,7 +198,7 @@ const ScoreTable: React.FC = () => {
                             <TextField {...params} label='Điểm chữ' variant='outlined' />
                         )}
                         options={scoreOptionsMap[info.row.original.scoreCh || 'F']}
-                        value={info.row.original.scoreChChange || info.row.original.scoreCh || null || ''}
+                        value={(info.row.original.scoreChChange || info.row.original.scoreCh || null) as ScoreCh}
                         onChange={(event, newValue) => handleScoreChange(info.row.original, newValue as ScoreCh)}
                         isOptionEqualToValue={(option, value) => option === value}
                     />
@@ -217,7 +229,7 @@ const ScoreTable: React.FC = () => {
                 ),
             }),
         ],
-        [handleScoreChange],
+        [handleScoreChange, handleDiem10Change],
     );
 
     const table = useReactTable({
@@ -247,21 +259,49 @@ const ScoreTable: React.FC = () => {
             return acc;
         }, {});
     }, [scores]);
-
+    const handleToggleUploadFile = useCallback(() => {
+        dispatch({ type: 'TOGGLE_UPLOAD_FILE' });
+    }, [dispatch]);
     return (
         <Card>
-            <CardHeader title={'Bảng Điểm'} />
+            <CardHeader
+                title={
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Typography variant='h6'>Bảng Điểm</Typography>
+                        <FormControlLabel
+                            control={<Checkbox onChange={handleToggleUploadFile} checked={state.toggleUploadFile} />}
+                            label={`${state.toggleUploadFile ? 'Ẩn' : 'Hiện'} form tải lên`}
+                        />
+                    </Box>
+                }
+            />
             <CardContent>
                 <Box>
-                    <Box sx={{ marginBottom: 2 }}>
-                        <DebouncedInput
-                            fullWidth
-                            label='Search'
-                            variant='outlined'
-                            value={searchQuery}
-                            onChange={value => setSearchQuery(value as string)}
-                            debounce={500}
-                        />
+                    <Box
+                        sx={{
+                            marginBottom: 2,
+                            flexDirection: 'row',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Box sx={{ flex: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                            <DebouncedInput
+                                fullWidth
+                                label='Search'
+                                variant='outlined'
+                                value={searchQuery}
+                                onChange={value => setSearchQuery(value as string)}
+                                debounce={500}
+                            />
+                        </Box>
                     </Box>
                     {searchQuery ? (
                         <TableContainer component={Paper}>
@@ -305,7 +345,7 @@ const ScoreTable: React.FC = () => {
                     ) : (
                         Object.keys(groupedScores).map((semester) => (
                             <Box key={semester} mb={4}>
-                                <Typography variant="h6" sx={{ mb: 2 }}>{semester}</Typography>
+                                <Typography variant='h6' sx={{ mb: 2 }}>{semester}</Typography>
                                 <TableContainer component={Paper}>
                                     <Table>
                                         <TableHead>
@@ -357,4 +397,3 @@ const ScoreTable: React.FC = () => {
 };
 
 export default ScoreTable;
-

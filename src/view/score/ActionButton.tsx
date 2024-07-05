@@ -19,20 +19,22 @@ const subtleBounce = keyframes`
 
 const FloatingButtonContainerRight = styled('div')({
     position: 'fixed',
-    bottom: 5,
-    right: 5,
+    bottom: 10,
+    right: 10,
     display: 'flex',
     flexDirection: 'row',
     gap: 16,
+    zIndex: 1000,
 });
 
 const FloatingButtonContainerLeft = styled('div')({
     position: 'fixed',
-    bottom: 5,
+    bottom: 10,
     left: 10,
     display: 'flex',
     flexDirection: 'row',
     gap: 16,
+    zIndex: 1000,
 });
 
 const FabStyled = styled(Fab)({
@@ -47,15 +49,15 @@ const ActionButton = () => {
     return (
         <>
             <FloatingButtonContainerLeft>
-                <Tooltip title={'Thêm học phần'}>
-                    <Fab color='primary' aria-label='add'>
+                <Tooltip title={'Thêm học phần'} arrow>
+                    <Fab color='primary' size={'medium'} aria-label='add'>
                         <Add onClick={toggleDialog} />
                     </Fab>
                 </Tooltip>
             </FloatingButtonContainerLeft>
             <FloatingButtonContainerRight>
-                <Tooltip title={'Gợi ý cải thiện học phần'}>
-                    <FabStyled variant={'extended'} color='primary' aria-label='add'>
+                <Tooltip title={'Gợi ý cải thiện học phần'} arrow>
+                    <FabStyled variant={'extended'} color='primary' aria-label='add' size={'medium'}>
                         Gợi ý cải thiện học phần
                     </FabStyled>
                 </Tooltip>

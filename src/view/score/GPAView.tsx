@@ -3,6 +3,7 @@ import { Box, Grid, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { useScore } from '@/view/score/ScoreProvider';
 import { calculateGPA } from '@/common/services/gpa.service';
+import { toast } from 'react-toastify';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -28,9 +29,12 @@ const GpaDisplay: React.FC = () => {
         setGpa(gpa);
         setGpaNew(gpaNew);
         setDifference(difference);
+        toast.success(`GPA đã được cập nhật thành ${gpaNew.toFixed(2)}`, {
+            toastId: `update_gpa_${gpaNew}`
+        });
     }, [scores]);
     return (
-        <Box sx={{ flexGrow: 1, padding: 4 }}>
+        <Box sx={{ flexGrow: 1, marginTop: 2, marginBottom: 2 }}>
             <Grid container spacing={3} justifyContent='center' alignItems='center'>
                 <Grid item xs={12} sm={4}>
                     <Item>
