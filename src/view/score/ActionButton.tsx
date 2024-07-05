@@ -1,6 +1,6 @@
 import { Tooltip } from '@mui/material';
 import Fab from '@mui/material/Fab';
-import { Add } from '@mui/icons-material';
+import { Add, QuestionMark } from '@mui/icons-material';
 import React, { useCallback } from 'react';
 import { keyframes, styled } from '@mui/system';
 import { useScore } from '@/view/score/ScoreProvider';
@@ -46,6 +46,10 @@ const ActionButton = () => {
         dispatch({ type: 'TOGGLE_DIALOG' });
     }, [dispatch]);
 
+    const toggleTutorial = useCallback(() => {
+        dispatch({ type: 'TOGGLE_SHOW_TUTORIAL' });
+    }, [dispatch]);
+
     return (
         <>
             <FloatingButtonContainerLeft>
@@ -53,7 +57,15 @@ const ActionButton = () => {
                     <Fab color='primary' size={'medium'} aria-label='add'>
                         <Add onClick={toggleDialog} />
                     </Fab>
+
                 </Tooltip>
+                <Tooltip title={'Xem hướng dẫn'} arrow>
+                    <Fab color='warning' size={'medium'} aria-label='add'>
+                        <QuestionMark onClick={toggleTutorial} />
+                    </Fab>
+
+                </Tooltip>
+
             </FloatingButtonContainerLeft>
             <FloatingButtonContainerRight>
                 <Tooltip title={'Gợi ý cải thiện học phần'} arrow>
