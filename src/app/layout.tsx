@@ -3,14 +3,14 @@ import { Roboto } from 'next/font/google';
 import './globals.css';
 import ThemeProviderWrapper from '@/core/ThemeProviderWrapper';
 import Header from '@/core/layout/Header';
-import Fab from '@mui/material/Fab';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
 
 const roboto = Roboto({
     weight: '400',
     subsets: ['vietnamese'],
 });
-
-
 
 export const metadata: Metadata = {
     title: 'Create Next App',
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+
     return (
         <html lang='en'>
         <body className={`${roboto.className} bg-gray-100`}>
@@ -25,8 +26,8 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Header />
             <main className='p-4'>
                 {children}
+                <ToastContainer />
             </main>
-
         </ThemeProviderWrapper>
         </body>
         </html>

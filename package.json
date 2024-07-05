@@ -11,13 +11,17 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@hookform/resolvers": "^3.7.0",
     "@mui/icons-material": "^5.15.21",
     "@mui/material": "^5.15.21",
     "@mui/utils": "^5.15.20",
     "@tanstack/react-table": "^8.19.2",
     "next": "14.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hook-form": "^7.52.1",
+    "react-toastify": "^10.0.5",
+    "valibot": "^0.35.0"
   },
   "devDependencies": {
     "@types/node": "^20",

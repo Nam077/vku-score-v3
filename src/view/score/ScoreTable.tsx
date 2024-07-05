@@ -15,31 +15,56 @@ import {
     TableHead,
     TableRow,
     Paper,
-    TablePagination,
     TableSortLabel,
     Autocomplete,
     TableCell,
     Chip,
-    Box, TextField, Card, CardHeader, CardContent,
+    Box,
+    TextField,
+    Card,
+    CardHeader,
+    CardContent,
+    Tooltip,
 } from '@mui/material';
-import { IScore, ScoreCh } from '@/common/interfaces/score';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
 import DebouncedInput from '@/view/component/DebouncedInput';
+import { useScore } from '@/view/score/ScoreProvider';
+import { Delete, Restore } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
+import { IScore, ScoreCh } from '@/common/interfaces/score';
 
-interface ScoreTableProps {
-    scores: IScore[];
+interface IScoreWithAction extends IScore {
+    action?: string;
 }
 
 const TableRowStyled = styled(TableRow)`
   padding: 0.5rem;
   text-align: center;
 `;
-const TableCellHeader = styled(TableCell)`
-  font-weight: bold;
-`;
 
 const TableCellStyled = styled(TableCell)`
+  color: #3b4055;
+  padding: 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  background-color: ${(props) => props.theme.palette.background.default};
+
+  &:last-child {
+    border-right: none;
+  }
+`;
+
+const TableCellHeader = styled(TableCell)`
+  color: #3b4055;
+  font-weight: bold;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  background-color: ${(props) => props.theme.palette.background.default};
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 const getColor = (scoreCh: ScoreCh | null, scoreChChange: ScoreCh | null) => {
@@ -49,7 +74,8 @@ const getColor = (scoreCh: ScoreCh | null, scoreChChange: ScoreCh | null) => {
     return '';
 };
 
-const getChipColor = (scoreCh: ScoreCh | null) => {
+const getChipColor = (scoreCh: ScoreCh | null | undefined) => {
+    if (!scoreCh) return 'default';
     switch (scoreCh) {
         case 'A':
             return 'success';
@@ -74,32 +100,24 @@ const scoreOptionsMap: { [key in Exclude<ScoreCh, null>]: ScoreCh[] } = {
     'A': ['A'],
 };
 
-const columnHelper = createColumnHelper<IScore>();
+const columnHelper = createColumnHelper<IScoreWithAction>();
 
-const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
-    const [scoreState, setScoreState] = useState<IScore[]>(scores);
+const ScoreTable: React.FC = () => {
+    const { state, dispatch } = useScore();
+    const { scores } = state;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleScoreChange = useCallback((row: IScore, newValue: ScoreCh) => {
-        setScoreState((prevScores) =>
-            prevScores.map((score) =>
-                score.id === row.id
-                    ? {
-                        ...score,
-                        scoreChChange: newValue === row.scoreCh ? null : newValue,
-                    }
-                    : score,
-            ),
-        );
-    }, []);
+        dispatch({ type: 'CHANGE_SCORE_CH', payload: { row, newValue } });
+    }, [dispatch]);
 
     const sortedScores = useMemo(() => {
         if (!searchQuery) {
-            return scoreState;
+            return scores;
         }
 
         const fieldsToCheck: (keyof IScore)[] = ['name', 'countTC', 'countLH', 'scoreCC', 'scoreBT', 'scoreGK', 'scoreCK', 'scoreT10', 'scoreCh'];
-        return [...scoreState].sort((a, b) => {
+        return [...scores].sort((a, b) => {
             const aMatches = fieldsToCheck.some(field => a[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase()));
             const bMatches = fieldsToCheck.some(field => b[field]?.toString().toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -107,9 +125,9 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
             if (!aMatches && bMatches) return 1;
             return 0;
         });
-    }, [scoreState, searchQuery]);
+    }, [scores, searchQuery]);
 
-    const columns = useMemo<ColumnDef<IScore, any>[]>(
+    const columns = useMemo<ColumnDef<IScoreWithAction, any>[]>(
         () => [
             columnHelper.accessor('id', {
                 header: 'ID',
@@ -118,12 +136,11 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
                         {info.row.original.id}
                     </Typography>
                 ),
-
             }),
             columnHelper.accessor('name', {
                 header: 'Tên học phần',
                 cell: (info) => (
-                    <Typography sx={{ fontWeight: 'bold' }} variant='body1'>
+                    <Typography sx={{ fontWeight: 'bold' }} variant='body1' textAlign={'left'}>
                         {info.row.original.name}
                     </Typography>
                 ),
@@ -149,13 +166,13 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
             columnHelper.accessor('scoreT10', {
                 header: 'Điểm hệ 10',
             }),
-            columnHelper.accessor('value', {
+            columnHelper.accessor('scoreCh', {
                 header: 'Điểm chữ',
                 cell: (info) => (
                     <Chip
-                        color={getChipColor(info.row.original.scoreCh || 'F')}
+                        color={getChipColor(info.row.original.scoreCh)}
                         sx={{ fontWeight: 'bold' }}
-                        label={info.row.original.scoreCh || 'F'}
+                        label={info.row.original.scoreCh || ''}
                     />
                 ),
             }),
@@ -163,14 +180,40 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
                 header: 'Thay đổi',
                 cell: (info) => (
                     <Autocomplete
+                        disabled={info.row.original.scoreCh === 'A'}
                         disableClearable
                         renderInput={(params) => (
                             <TextField {...params} label='Điểm chữ' variant='outlined' />
                         )}
                         options={scoreOptionsMap[info.row.original.scoreCh || 'F']}
-                        value={info.row.original.scoreChChange || info.row.original.scoreCh || ''}
+                        value={info.row.original.scoreChChange || info.row.original.scoreCh || null || ''}
                         onChange={(event, newValue) => handleScoreChange(info.row.original, newValue as ScoreCh)}
+                        isOptionEqualToValue={(option, value) => option === value}
                     />
+                ),
+            }),
+            columnHelper.accessor('action', {
+                header: 'Hành động',
+                cell: (info) => (
+                    <Box flexDirection='row' display='flex' justifyContent='center'>
+                        <Tooltip title={'Xóa'}>
+                            <IconButton color={'warning'} onClick={() => handleRemove(info.row.original.id)}
+                            >
+                                <Delete />
+                            </IconButton>
+                        </Tooltip>
+                        {info.row.original.scoreChChange && (
+                            <Tooltip title={'Hủy thay đổi'}>
+                                <IconButton
+                                    color={'primary'}
+                                    onClick={() => handleScoreChange(info.row.original, info.row.original.scoreCh as ScoreCh)}
+                                >
+                                    <Restore />
+                                </IconButton>
+                            </Tooltip>
+                        )
+                        }
+                    </Box>
                 ),
             }),
         ],
@@ -190,6 +233,21 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
         },
     });
 
+    const handleRemove = useCallback((id: number) => {
+        dispatch({ type: 'DELETE_SCORE', payload: { id } });
+    }, [dispatch]);
+
+    const groupedScores = useMemo(() => {
+        return scores.reduce((acc: { [key: string]: IScore[] }, score) => {
+            const semester = score.semester || 'Không rõ'; // Assign "Không rõ" if semester is missing
+            if (!acc[semester]) {
+                acc[semester] = [];
+            }
+            acc[semester].push(score);
+            return acc;
+        }, {});
+    }, [scores]);
+
     return (
         <Card>
             <CardHeader title={'Bảng Điểm'} />
@@ -205,55 +263,93 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
                             debounce={500}
                         />
                     </Box>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => (
-                                            <TableCellHeader key={header.id}>
-                                                <TableSortLabel
-                                                    active={header.column.getIsSorted() !== false}
-                                                    direction={header.column.getIsSorted() ? 'desc' : 'asc'}
-                                                    onClick={header.column.getToggleSortingHandler()}
+                    {searchQuery ? (
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <TableRow key={headerGroup.id}>
+                                            {headerGroup.headers.map((header) => (
+                                                <TableCellHeader key={header.id}>
+                                                    <TableSortLabel
+                                                        active={header.column.getIsSorted() !== false}
+                                                        direction={header.column.getIsSorted() ? 'desc' : 'asc'}
+                                                        onClick={header.column.getToggleSortingHandler()}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef.header,
+                                                            header.getContext(),
+                                                        )}
+                                                    </TableSortLabel>
+                                                </TableCellHeader>
+                                            ))}
+                                        </TableRow>
+                                    ))}
+                                </TableHead>
+                                <TableBody>
+                                    {table.getRowModel().rows.map((row) => (
+                                        <TableRowStyled key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCellStyled
+                                                    key={cell.id}
+                                                    style={{ backgroundColor: getColor(cell.row.original.scoreCh || null, cell.row.original.scoreChChange || null) }}
                                                 >
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext(),
-                                                    )}
-                                                </TableSortLabel>
-                                            </TableCellHeader>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableHead>
-                            <TableBody>
-                                {table.getRowModel().rows.map((row) => (
-                                    <TableRowStyled key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCellStyled
-                                                key={cell.id}
-                                                style={{ backgroundColor: getColor(cell.row.original.scoreCh || null, cell.row.original.scoreChChange || null) }}
-                                            >
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCellStyled>
-                                        ))}
-                                    </TableRowStyled>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            component='div'
-                            rowsPerPageOptions={[10, 25, 50, 100]}
-                            count={sortedScores.length}
-                            rowsPerPage={table.getState().pagination.pageSize}
-                            page={table.getState().pagination.pageIndex}
-                            onPageChange={(event, newPage) => table.setPageIndex(newPage)}
-                            onRowsPerPageChange={(event) =>
-                                table.setPageSize(Number(event.target.value))
-                            }
-                        />
-                    </TableContainer>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCellStyled>
+                                            ))}
+                                        </TableRowStyled>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    ) : (
+                        Object.keys(groupedScores).map((semester) => (
+                            <Box key={semester} mb={4}>
+                                <Typography variant="h6" sx={{ mb: 2 }}>{semester}</Typography>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableHead>
+                                            {table.getHeaderGroups().map((headerGroup) => (
+                                                <TableRow key={headerGroup.id}>
+                                                    {headerGroup.headers.map((header) => (
+                                                        <TableCellHeader key={header.id}>
+                                                            <TableSortLabel
+                                                                active={header.column.getIsSorted() !== false}
+                                                                direction={header.column.getIsSorted() ? 'desc' : 'asc'}
+                                                                onClick={header.column.getToggleSortingHandler()}
+                                                            >
+                                                                {flexRender(
+                                                                    header.column.columnDef.header,
+                                                                    header.getContext(),
+                                                                )}
+                                                            </TableSortLabel>
+                                                        </TableCellHeader>
+                                                    ))}
+                                                </TableRow>
+                                            ))}
+                                        </TableHead>
+                                        <TableBody>
+                                            {groupedScores[semester].map((row) => (
+                                                <TableRowStyled key={row.id}>
+                                                    {table.getRowModel().rows
+                                                        .filter(r => r.original.id === row.id)
+                                                        .map((r) => r.getVisibleCells().map((cell) => (
+                                                            <TableCellStyled
+                                                                key={cell.id}
+                                                                style={{ backgroundColor: getColor(cell.row.original.scoreCh || null, cell.row.original.scoreChChange || null) }}
+                                                            >
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                            </TableCellStyled>
+                                                        )))
+                                                    }
+                                                </TableRowStyled>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
+                        ))
+                    )}
                 </Box>
             </CardContent>
         </Card>
@@ -261,3 +357,4 @@ const ScoreTable: React.FC<ScoreTableProps> = ({ scores }) => {
 };
 
 export default ScoreTable;
+
