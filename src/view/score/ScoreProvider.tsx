@@ -54,7 +54,7 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
                 return state;
             }
             action.payload.id = generateIdUnique(state.scores);
-            toast.success(JSON.stringify(action.payload), {
+            toast.success(`Đã thêm học phần ${action.payload.name}`, {
                 toastId: `add_score_${action.payload.id}`,
             });
             return { ...state, scores: [...state.scores, action.payload] };
@@ -66,6 +66,9 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
                 ),
             };
         case 'DELETE_SCORE':
+            toast.error(`Đã xóa học phần`, {
+                toastId: `delete_score_${action.payload.id}`,
+            });
             return {
                 ...state,
                 scores: state.scores.filter((score) => score.id !== action.payload.id),
