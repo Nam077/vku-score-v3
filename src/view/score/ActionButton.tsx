@@ -41,7 +41,8 @@ const FabStyled = styled(Fab)({
     animation: `${subtleBounce} 1s infinite`,
 });
 const ActionButton = () => {
-    const { dispatch } = useScore();
+    const { dispatch,state } = useScore();
+    const {scores}=state;
     const toggleDialog = useCallback(() => {
         dispatch({ type: 'TOGGLE_DIALOG' });
     }, [dispatch]);
@@ -53,27 +54,27 @@ const ActionButton = () => {
     return (
         <>
             <FloatingButtonContainerLeft>
-                <Tooltip title={'Thêm học phần'} arrow>
+                <Tooltip  onClick={toggleDialog}  title={'Thêm học phần'} arrow>
                     <Fab color='primary' size={'medium'} aria-label='add'>
-                        <Add onClick={toggleDialog} />
+                        <Add />
                     </Fab>
 
                 </Tooltip>
                 <Tooltip title={'Xem hướng dẫn'} arrow>
-                    <Fab color='warning' size={'medium'} aria-label='add'>
-                        <QuestionMark onClick={toggleTutorial} />
+                    <Fab  onClick={toggleTutorial}  color='warning' size={'medium'} aria-label='add'>
+                        <QuestionMark/>
                     </Fab>
 
                 </Tooltip>
 
             </FloatingButtonContainerLeft>
-            <FloatingButtonContainerRight>
+            {scores.length>0&&(<FloatingButtonContainerRight>
                 <Tooltip title={'Gợi ý cải thiện học phần'} arrow>
                     <FabStyled variant={'extended'} color='primary' aria-label='add' size={'medium'}>
                         Gợi ý cải thiện học phần
                     </FabStyled>
                 </Tooltip>
-            </FloatingButtonContainerRight>
+            </FloatingButtonContainerRight>)}
         </>
     );
 };
