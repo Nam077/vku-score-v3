@@ -24,7 +24,7 @@ import {
     Card,
     CardHeader,
     CardContent,
-    Tooltip, Checkbox, FormLabel, FormControlLabel,
+    Tooltip, Checkbox, FormLabel, FormControlLabel, Button,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
@@ -64,6 +64,7 @@ const TableCellHeader = styled(TableCell)`
   border-right: 1px solid #e0e0e0;
   background-color: ${(props) => props.theme.palette.background.default};
   text-align: center;
+
   &:last-child {
     border-right: none;
   }
@@ -294,6 +295,18 @@ const ScoreTable: React.FC = () => {
                                 control={<Checkbox onChange={handleToggleExtraColumns} checked={isShowExtraColumn} />}
                                 label={`${!isShowExtraColumn ? 'Ẩn' : 'Hiện'} cột bổ sung`}
                             />
+                            <Box>
+                               <Tooltip title={'Xoá toàn bộ điểm'}>
+                                   <Button
+                                       variant='outlined'
+                                       color='error'
+                                       size={'small'}
+                                       onClick={() => dispatch({ type: 'RESET_SCORES' })}
+                                   >
+                                        Xoá toàn bộ
+                                   </Button>
+                               </Tooltip>
+                            </Box>
                         </Box>
                     </Box>
                 }

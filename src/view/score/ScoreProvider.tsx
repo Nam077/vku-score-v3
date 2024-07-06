@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode, Dispatch } from 'react';
 import { IScore, ScoreCh } from '@/common/interfaces/score';
 import { toast } from 'react-toastify';
 
@@ -37,18 +37,21 @@ type Action =
     | { type: 'TOGGLE_UPLOAD_FILE' }
     | { type: 'TOGGLE_SHOW_TUTORIAL' }
     | { type: 'TOGGLE_SHOW_RECOMMEND' }
-    | { type: 'CHANGE_SCORE_CH'; payload: { row: IScore; newValue: ScoreCh } };
+    | { type: 'CHANGE_SCORE_CH'; payload: { row: IScore; newValue: ScoreCh } }
+    | { type: 'RESET_SCORES' };
 
 // Tạo ScoreContext với giá trị mặc định
 const ScoreContext = createContext<ScoreContextType>({
     state: initialState,
     dispatch: () => undefined,
 });
+
 const generateIdUnique = (scores: IScore[]): number => {
     const ids = scores.map((score) => score.id);
     const maxId = Math.max(...ids);
     return maxId + 1;
 };
+
 // Tạo reducer
 const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
     switch (action.type) {
@@ -110,6 +113,11 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
             return { ...state, toggleShowTutorial: !state.toggleShowTutorial };
         case 'TOGGLE_SHOW_RECOMMEND':
             return { ...state, toggleShowRecommend: !state.toggleShowRecommend };
+        case 'RESET_SCORES':
+            toast.info('Tất cả các điểm đã được đặt lại.',{
+                toastId: 'reset_scores',
+            });
+            return initialState;
         default:
             return state;
     }
@@ -118,6 +126,30 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
 // Tạo ScoreProvider
 const ScoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [state, dispatch] = useReducer(scoreReducer, initialState);
+
+    useEffect(() => {
+        try {
+            const localData = typeof window !== 'undefined' ? localStorage.getItem('scoreState') : null;
+            if (localData) {
+                const parsedData = JSON.parse(localData);
+                if (parsedData) {
+                    dispatch({ type: 'SET_SCORES', payload: parsedData.scores });
+                }
+            }
+        } catch (error) {
+            console.error("Failed to load state from localStorage:", error);
+        }
+    }, []);
+
+    useEffect(() => {
+        try {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('scoreState', JSON.stringify(state));
+            }
+        } catch (error) {
+            console.error("Failed to save state to localStorage:", error);
+        }
+    }, [state]);
 
     return (
         <ScoreContext.Provider value={{ state, dispatch }}>

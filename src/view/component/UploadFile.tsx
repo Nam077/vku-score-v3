@@ -53,7 +53,7 @@ const FileUpload: React.FC = () => {
     return (
         <>
             {toggleUploadFile && (
-                <Box sx={{ width: '100%' }}>
+                <Box sx={{ marginBottom: 2 , width: '100%' }}>
                     <Paper sx={{ padding: 2, textAlign: 'center' }}>
                         <Typography variant='h6' gutterBottom>
                             Tải lên tệp
