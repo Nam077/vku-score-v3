@@ -177,10 +177,11 @@ const RecommendScoreTable: React.FC = () => {
             columnHelper.accessor('scoreT10', {
                 header: 'Điểm hệ 10',
                 cell: (info) => (
-                    <TextField
-                        value={info.row.original.scoreT10 || ''}
+                    <DebouncedInput
+                        value={info.row.original.scoreT10?.toString() || ''}
                         variant='outlined'
-                        onChange={(event) => handleDiem10Change(info.row.original, Number(event.target.value))}
+                        onChange={(value) => handleDiem10Change(info.row.original, Number(value))}
+                        debounce={500}
                     />
                 ),
             }),

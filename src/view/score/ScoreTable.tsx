@@ -239,7 +239,7 @@ const ScoreTable: React.FC = () => {
                 ),
             }),
         ],
-        [isShowExtraColumn, handleScoreChange, handleRemove],
+        [isShowExtraColumn, handleDiem10Change, handleScoreChange, handleRemove],
     );
 
     const table = useReactTable({
