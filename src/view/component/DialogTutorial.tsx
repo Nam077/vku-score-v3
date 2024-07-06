@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import MarkdownPreview from '@uiw/react-markdown-preview';
-import { readme2 } from '@/common/data';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import React from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import Tutorial from '@/view/component/Tutorial';
 import { useScore } from '@/view/score/ScoreProvider';
 

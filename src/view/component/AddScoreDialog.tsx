@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
+    Autocomplete,
+    Box,
     Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    MenuItem,
     TextField,
-    MenuItem, Box, Checkbox, FormControlLabel,
-    Typography, Autocomplete,
+    Typography,
 } from '@mui/material';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { IScore, ScoreCh } from '@/common/interfaces/score';
+import { IScore } from '@/common/interfaces/score';
 import { useScore } from '@/view/score/ScoreProvider';
-import { useForm, Controller } from 'react-hook-form';
-import { minLength, object, string, nullable, pipe, literal, union, number, minValue } from 'valibot';
+import { Controller, useForm } from 'react-hook-form';
+import { literal, minLength, minValue, nullable, number, object, pipe, string, union } from 'valibot';
 
 const schema = object({
     name: pipe(string(), minLength(3, 'Tên học phần phải có ít nhất 3 ký tự')),

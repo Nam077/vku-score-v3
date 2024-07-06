@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useDropzone, Accept } from 'react-dropzone';
-import { Button, Box, Chip, Paper, Typography } from '@mui/material';
+import { Accept, useDropzone } from 'react-dropzone';
+import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import { toast } from 'react-toastify';
 import { isScoreArray } from '@/common/utils';
 import { useScore } from '@/view/score/ScoreProvider';

@@ -4,8 +4,6 @@ import { Add, QuestionMark } from '@mui/icons-material';
 import React, { useCallback } from 'react';
 import { keyframes, styled } from '@mui/system';
 import { useScore } from '@/view/score/ScoreProvider';
-import { recommendLinear } from '@/common/services/recomend.service';
-import { toast } from 'react-toastify';
 
 const subtlePulseAndRotate = keyframes`
   0%, 100% {

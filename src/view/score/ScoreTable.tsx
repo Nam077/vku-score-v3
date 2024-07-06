@@ -1,30 +1,33 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-    useReactTable,
-    getCoreRowModel,
-    getSortedRowModel,
-    getPaginationRowModel,
     ColumnDef,
-    flexRender,
     createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
 } from '@tanstack/react-table';
 import {
+    Autocomplete,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    Checkbox,
+    Chip,
+    FormControlLabel,
+    Paper,
     Table,
     TableBody,
+    TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
     TableSortLabel,
-    Autocomplete,
-    TableCell,
-    Chip,
-    Box,
     TextField,
-    Card,
-    CardHeader,
-    CardContent,
-    Tooltip, Checkbox, FormLabel, FormControlLabel, Button,
+    Tooltip,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
@@ -33,7 +36,6 @@ import { Delete, Restore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { IScore, ScoreCh } from '@/common/interfaces/score';
 import DebouncedInput from '@/view/component/DebouncedInput';
-import DebouncedInputCustom from '@/view/component/DebouncedInputCustom';
 
 interface IScoreWithAction extends IScore {
     action?: string;

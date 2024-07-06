@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import RecommendScoreTable from '@/view/score/RecomendScore';
 import { useScore } from '@/view/score/ScoreProvider';
 

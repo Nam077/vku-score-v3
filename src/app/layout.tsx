@@ -3,7 +3,7 @@ import { Roboto } from 'next/font/google';
 import './globals.css';
 import ThemeProviderWrapper from '@/core/ThemeProviderWrapper';
 import Header from '@/core/layout/Header';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
 

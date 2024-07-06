@@ -1,6 +1,5 @@
 import { linearData } from '@/common/linear';
 import { IScore } from '@/common/interfaces/score';
-import { removeAscent } from '@/common/services/string.service';
 
 interface Subject {
     name: string;
