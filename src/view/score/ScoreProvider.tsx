@@ -114,7 +114,7 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
         case 'TOGGLE_SHOW_RECOMMEND':
             return { ...state, toggleShowRecommend: !state.toggleShowRecommend };
         case 'RESET_SCORES':
-            toast.info('Tất cả các điểm đã được đặt lại.',{
+            toast.info('Tất cả các điểm đã được đặt lại.', {
                 toastId: 'reset_scores',
             });
             return initialState;
@@ -133,12 +133,16 @@ const ScoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             if (localData) {
                 const parsedData = JSON.parse(localData);
                 if (parsedData) {
+                    if (parsedData.scores.length > 0) {
+                        dispatch({ type: 'TOGGLE_UPLOAD_FILE' });
+                    }
                     dispatch({ type: 'SET_SCORES', payload: parsedData.scores });
-                    dispatch({ type: 'TOGGLE_UPLOAD_FILE' });
+                    // nếu scores.length > 0 thì hiện toggleUploadFile = false
+
                 }
             }
         } catch (error) {
-            console.error("Failed to load state from localStorage:", error);
+            console.error('Failed to load state from localStorage:', error);
         }
     }, []);
 
@@ -148,7 +152,7 @@ const ScoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 localStorage.setItem('scoreState', JSON.stringify(state));
             }
         } catch (error) {
-            console.error("Failed to save state to localStorage:", error);
+            console.error('Failed to save state to localStorage:', error);
         }
     }, [state]);
 
