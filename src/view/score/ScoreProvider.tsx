@@ -134,6 +134,7 @@ const ScoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 const parsedData = JSON.parse(localData);
                 if (parsedData) {
                     dispatch({ type: 'SET_SCORES', payload: parsedData.scores });
+                    dispatch({ type: 'TOGGLE_UPLOAD_FILE' });
                 }
             }
         } catch (error) {
