@@ -4,19 +4,23 @@ import { Add, QuestionMark } from '@mui/icons-material';
 import React, { useCallback } from 'react';
 import { keyframes, styled } from '@mui/system';
 import { useScore } from '@/view/score/ScoreProvider';
+import { recommendLinear } from '@/common/services/recomend.service';
+import { toast } from 'react-toastify';
 
-const subtleBounce = keyframes`
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
+const subtlePulseAndRotate = keyframes`
+  0%, 100% {
+    transform: scale(1);
   }
-  40% {
-    transform: translateY(-5px);
+  25% {
+    transform: scale(1.05);
   }
-  60% {
-    transform: translateY(-3px);
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.05);
   }
 `;
-
 const FloatingButtonContainerRight = styled('div')({
     position: 'fixed',
     bottom: 10,
@@ -38,11 +42,11 @@ const FloatingButtonContainerLeft = styled('div')({
 });
 
 const FabStyled = styled(Fab)({
-    animation: `${subtleBounce} 1s infinite`,
+    animation: `${subtlePulseAndRotate} 1s infinite`,
 });
 const ActionButton = () => {
-    const { dispatch,state } = useScore();
-    const {scores}=state;
+    const { dispatch, state } = useScore();
+    const { scores } = state;
     const toggleDialog = useCallback(() => {
         dispatch({ type: 'TOGGLE_DIALOG' });
     }, [dispatch]);
@@ -50,27 +54,30 @@ const ActionButton = () => {
     const toggleTutorial = useCallback(() => {
         dispatch({ type: 'TOGGLE_SHOW_TUTORIAL' });
     }, [dispatch]);
-
+    const toggleRecommend = useCallback(() => {
+        dispatch({ type: 'TOGGLE_SHOW_RECOMMEND' });
+    }, [dispatch]);
     return (
         <>
             <FloatingButtonContainerLeft>
-                <Tooltip  onClick={toggleDialog}  title={'Thêm học phần'} arrow>
+                <Tooltip onClick={toggleDialog} title={'Thêm học phần'} arrow>
                     <Fab color='primary' size={'medium'} aria-label='add'>
                         <Add />
                     </Fab>
 
                 </Tooltip>
                 <Tooltip title={'Xem hướng dẫn'} arrow>
-                    <Fab  onClick={toggleTutorial}  color='warning' size={'medium'} aria-label='add'>
-                        <QuestionMark/>
+                    <Fab onClick={toggleTutorial} color='warning' size={'medium'} aria-label='add'>
+                        <QuestionMark />
                     </Fab>
 
                 </Tooltip>
 
             </FloatingButtonContainerLeft>
-            {scores.length>0&&(<FloatingButtonContainerRight>
+            {scores.length > 0 && (<FloatingButtonContainerRight>
                 <Tooltip title={'Gợi ý cải thiện học phần'} arrow>
-                    <FabStyled variant={'extended'} color='primary' aria-label='add' size={'medium'}>
+                    <FabStyled variant={'extended'} color='success' aria-label='add' size={'medium'}
+                               onClick={toggleRecommend}>
                         Gợi ý cải thiện học phần
                     </FabStyled>
                 </Tooltip>

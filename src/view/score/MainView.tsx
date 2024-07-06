@@ -7,6 +7,7 @@ import React from 'react';
 import { useScore } from '@/view/score/ScoreProvider';
 import Tutorial from '@/view/component/Tutorial';
 import DialogTutorial from '@/view/component/DialogTutorial';
+import RecommendScoreTableDialog from '@/view/score/RecommendScoreTableDialog';
 
 const MainView = () => {
     const { state } = useScore();
@@ -23,6 +24,7 @@ const MainView = () => {
             <ActionButton />
             <AddScoreDialog />
             <DialogTutorial />
+            <RecommendScoreTableDialog />
 
         </>
     );

@@ -8,6 +8,7 @@ interface ScoreState {
     toggleDialog: boolean;
     toggleUploadFile: boolean;
     toggleShowTutorial: boolean;
+    toggleShowRecommend: boolean;
 }
 
 // Định nghĩa interface cho ScoreContext
@@ -22,6 +23,7 @@ const initialState: ScoreState = {
     toggleDialog: false,
     toggleUploadFile: true,
     toggleShowTutorial: false,
+    toggleShowRecommend: false,
 };
 
 // Định nghĩa type cho các hành động
@@ -34,6 +36,7 @@ type Action =
     | { type: 'CHANGE_SCORE_T10'; payload: { row: IScore; newValue: number } }
     | { type: 'TOGGLE_UPLOAD_FILE' }
     | { type: 'TOGGLE_SHOW_TUTORIAL' }
+    | { type: 'TOGGLE_SHOW_RECOMMEND' }
     | { type: 'CHANGE_SCORE_CH'; payload: { row: IScore; newValue: ScoreCh } };
 
 // Tạo ScoreContext với giá trị mặc định
@@ -105,6 +108,8 @@ const scoreReducer = (state: ScoreState, action: Action): ScoreState => {
             return { ...state, toggleUploadFile: !state.toggleUploadFile };
         case 'TOGGLE_SHOW_TUTORIAL':
             return { ...state, toggleShowTutorial: !state.toggleShowTutorial };
+        case 'TOGGLE_SHOW_RECOMMEND':
+            return { ...state, toggleShowRecommend: !state.toggleShowRecommend };
         default:
             return state;
     }

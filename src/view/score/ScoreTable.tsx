@@ -33,6 +33,7 @@ import { Delete, Restore } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { IScore, ScoreCh } from '@/common/interfaces/score';
 import DebouncedInput from '@/view/component/DebouncedInput';
+import DebouncedInputCustom from '@/view/component/DebouncedInputCustom';
 
 interface IScoreWithAction extends IScore {
     action?: string;
@@ -62,7 +63,7 @@ const TableCellHeader = styled(TableCell)`
   border-bottom: 1px solid #e0e0e0;
   border-right: 1px solid #e0e0e0;
   background-color: ${(props) => props.theme.palette.background.default};
-
+  text-align: center;
   &:last-child {
     border-right: none;
   }
@@ -107,6 +108,7 @@ const ScoreTable: React.FC = () => {
     const { state, dispatch } = useScore();
     const { scores } = state;
     const [searchQuery, setSearchQuery] = useState('');
+    const [isShowExtraColumn, setIsShowExtraColumn] = useState(true);
 
     const handleScoreChange = useCallback((row: IScore, newValue: ScoreCh) => {
         dispatch({ type: 'CHANGE_SCORE_CH', payload: { row, newValue } });
@@ -131,7 +133,9 @@ const ScoreTable: React.FC = () => {
             return 0;
         });
     }, [scores, searchQuery]);
-
+    const handleRemove = useCallback((id: number) => {
+        dispatch({ type: 'DELETE_SCORE', payload: { id } });
+    }, [dispatch]);
     const columns = useMemo<ColumnDef<IScoreWithAction, any>[]>(
         () => [
             columnHelper.accessor('id', {
@@ -153,28 +157,31 @@ const ScoreTable: React.FC = () => {
             columnHelper.accessor('countTC', {
                 header: 'Số tín chỉ',
             }),
-            columnHelper.accessor('countLH', {
-                header: 'Số lần học',
-            }),
-            columnHelper.accessor('scoreCC', {
-                header: 'Điểm chuyên cần',
-            }),
-            columnHelper.accessor('scoreBT', {
-                header: 'Điểm bài tập',
-            }),
-            columnHelper.accessor('scoreGK', {
-                header: 'Điểm giữa kỳ',
-            }),
-            columnHelper.accessor('scoreCK', {
-                header: 'Điểm cuối kỳ',
-            }),
+            ...(isShowExtraColumn ? [
+                columnHelper.accessor('countLH', {
+                    header: 'Số lần học',
+                }),
+                columnHelper.accessor('scoreCC', {
+                    header: 'Điểm chuyên cần',
+                }),
+                columnHelper.accessor('scoreBT', {
+                    header: 'Điểm bài tập',
+                }),
+                columnHelper.accessor('scoreGK', {
+                    header: 'Điểm giữa kỳ',
+                }),
+                columnHelper.accessor('scoreCK', {
+                    header: 'Điểm cuối kỳ',
+                }),
+            ] : []),
             columnHelper.accessor('scoreT10', {
                 header: 'Điểm hệ 10',
                 cell: (info) => (
-                    <TextField
-                        value={info.row.original.scoreT10 || ''}
+                    <DebouncedInput
+                        value={info.row.original.scoreT10?.toString() || ''}
                         variant='outlined'
-                        onChange={(event) => handleDiem10Change(info.row.original, Number(event.target.value))}
+                        onChange={(value) => handleDiem10Change(info.row.original, Number(value))}
+                        debounce={500}
                     />
                 ),
             }),
@@ -229,7 +236,7 @@ const ScoreTable: React.FC = () => {
                 ),
             }),
         ],
-        [handleScoreChange, handleDiem10Change],
+        [isShowExtraColumn, handleScoreChange, handleRemove],
     );
 
     const table = useReactTable({
@@ -245,9 +252,6 @@ const ScoreTable: React.FC = () => {
         },
     });
 
-    const handleRemove = useCallback((id: number) => {
-        dispatch({ type: 'DELETE_SCORE', payload: { id } });
-    }, [dispatch]);
 
     const groupedScores = useMemo(() => {
         return scores.reduce((acc: { [key: string]: IScore[] }, score) => {
@@ -259,9 +263,15 @@ const ScoreTable: React.FC = () => {
             return acc;
         }, {});
     }, [scores]);
+
     const handleToggleUploadFile = useCallback(() => {
         dispatch({ type: 'TOGGLE_UPLOAD_FILE' });
     }, [dispatch]);
+
+    const handleToggleExtraColumns = () => {
+        setIsShowExtraColumn(!isShowExtraColumn);
+    };
+
     return (
         <Card>
             <CardHeader
@@ -274,10 +284,17 @@ const ScoreTable: React.FC = () => {
                         }}
                     >
                         <Typography variant='h6'>Bảng Điểm</Typography>
-                        <FormControlLabel
-                            control={<Checkbox onChange={handleToggleUploadFile} checked={state.toggleUploadFile} />}
-                            label={`${state.toggleUploadFile ? 'Ẩn' : 'Hiện'} form tải lên`}
-                        />
+                        <Box display='flex' alignItems='center'>
+                            <FormControlLabel
+                                control={<Checkbox onChange={handleToggleUploadFile}
+                                                   checked={state.toggleUploadFile} />}
+                                label={`${!state.toggleUploadFile ? 'Ẩn' : 'Hiện'} form tải lên`}
+                            />
+                            <FormControlLabel
+                                control={<Checkbox onChange={handleToggleExtraColumns} checked={isShowExtraColumn} />}
+                                label={`${!isShowExtraColumn ? 'Ẩn' : 'Hiện'} cột bổ sung`}
+                            />
+                        </Box>
                     </Box>
                 }
             />
