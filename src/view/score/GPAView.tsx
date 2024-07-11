@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Card, CardContent, Grid, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { useScore } from '@/view/score/ScoreProvider';
@@ -27,6 +27,14 @@ const MainTypography = styled(Typography)(({ theme }) => ({
     fontWeight: 'bold',
 }));
 
+const usePrevious = <T,>(value: T): T | undefined => {
+    const ref = useRef<T>();
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
+    return ref.current;
+};
+
 const GpaDisplay: React.FC = () => {
     const { state } = useScore();
     const { scores } = state;
@@ -36,6 +44,8 @@ const GpaDisplay: React.FC = () => {
     const [gpa10, setGpa10] = useState(0.0);
     const [allTinChi, setAllTinChi] = useState(0);
 
+    const prevGpaNew = usePrevious(gpaNew);
+
     useEffect(() => {
         const { gpa, gpaNew, difference, gpa10, allTinChi } = calculateGPA(scores);
         setGpa(gpa);
@@ -43,10 +53,13 @@ const GpaDisplay: React.FC = () => {
         setDifference(difference);
         setGpa10(gpa10);
         setAllTinChi(allTinChi);
-        toast.success(`GPA đã được cập nhật thành ${gpaNew.toFixed(2)}`, {
-            toastId: `update_gpa_${gpaNew}`,
-        });
-    }, [scores]);
+
+        if (prevGpaNew !== undefined && prevGpaNew !== gpaNew) {
+            toast.success(`GPA đã được cập nhật thành ${gpaNew.toFixed(2)}`, {
+                toastId: `update_gpa_${gpaNew}`,
+            });
+        }
+    }, [scores, gpaNew, prevGpaNew]);
 
     return (
         <Card variant='outlined' sx={{ marginTop: 2, marginBottom: 2 }}>
