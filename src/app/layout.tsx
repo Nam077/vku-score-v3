@@ -6,6 +6,7 @@ import Header from '@/core/layout/Header';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
+import Footer from '@/core/layout/Footer';
 
 const roboto = Roboto({
     weight: '400',
@@ -28,6 +29,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {children}
                 <ToastContainer />
             </main>
+            <Footer />
         </ThemeProviderWrapper>
         </body>
         </html>
