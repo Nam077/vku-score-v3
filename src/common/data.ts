@@ -99,7 +99,7 @@ export const readme2 = "# Hỗ trợ tính điểm GPA và gợi ý học cải 
     "    const cols = row.querySelectorAll('td');\n" +
     "\n" +
     "    if (cols.length === 1 && cols[0].colSpan === 13) {\n" +
-    "        currentSemester = cols[0].innerText.trim();\n" +
+    "        currentSemester = cols[0]?.innerText?.trim() || '';\n" +
     "    } else if (cols.length > 1) {\n" +
     "        if (currentSemester === '') {\n" +
     "            console.warn('Không tìm thấy kỳ học trước hàng điểm:', row);\n" +
@@ -107,20 +107,26 @@ export const readme2 = "# Hỗ trợ tính điểm GPA và gợi ý học cải 
     "        }\n" +
     "\n" +
     "        const convertEmptyToNull = (value) => value === \"\" ? null : value;\n" +
+    "        \n" +
+    "        const getTextContent = (col) => col?.innerText?.trim() || \"\";\n" +
+    "        const parseNumberSafe = (col) => {\n" +
+    "            const text = getTextContent(col);\n" +
+    "            return text === \"\" ? null : parseFloat(text);\n" +
+    "        };\n" +
     "\n" +
     "        const score = {\n" +
-    "            value: convertEmptyToNull(cols[1].innerText.trim()),\n" +
+    "            value: convertEmptyToNull(getTextContent(cols[1])),\n" +
     "            key: null,\n" +
-    "            id: parseInt(cols[0].innerText.trim()),\n" +
-    "            name: convertEmptyToNull(cols[1].innerText.trim()),\n" +
-    "            countTC: cols[2].innerText.trim() === \"\" ? null : parseFloat(cols[2].innerText.trim()),\n" +
-    "            countLH: cols[3].innerText.trim() === \"\" ? null : parseFloat(cols[3].innerText.trim()),\n" +
-    "            scoreCC: cols[4].innerText.trim() === \"\" ? null : parseFloat(cols[4].innerText.trim()),\n" +
-    "            scoreBT: cols[5].innerText.trim() === \"\" ? null : parseFloat(cols[5].innerText.trim()),\n" +
-    "            scoreGK: cols[6].innerText.trim() === \"\" ? null : parseFloat(cols[6].innerText.trim()),\n" +
-    "            scoreCK: cols[7].innerText.trim() === \"\" ? null : parseFloat(cols[7].innerText.trim()),\n" +
-    "            scoreT10: cols[8].innerText.trim() === \"\" ? null : parseFloat(cols[8].innerText.trim()),\n" +
-    "            scoreCh: validScoreCh.includes(cols[9].innerText.trim()) ? cols[9].innerText.trim() : null,\n" +
+    "            id: getTextContent(cols[0]) ? parseInt(getTextContent(cols[0])) : null,\n" +
+    "            name: convertEmptyToNull(getTextContent(cols[1])),\n" +
+    "            countTC: parseNumberSafe(cols[2]),\n" +
+    "            countLH: parseNumberSafe(cols[3]),\n" +
+    "            scoreCC: parseNumberSafe(cols[4]),\n" +
+    "            scoreBT: parseNumberSafe(cols[5]),\n" +
+    "            scoreGK: parseNumberSafe(cols[6]),\n" +
+    "            scoreCK: parseNumberSafe(cols[7]),\n" +
+    "            scoreT10: parseNumberSafe(cols[8]),\n" +
+    "            scoreCh: getTextContent(cols[9]) && validScoreCh.includes(getTextContent(cols[9])) ? getTextContent(cols[9]) : null,\n" +
     "            scoreChChange: null,\n" +
     "            semester: currentSemester\n" +
     "        };\n" +
